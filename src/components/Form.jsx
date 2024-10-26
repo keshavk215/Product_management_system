@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/products';
 
-const ProductForm = ({ onProductAdded }) => {
+const ProductForm = () => {
   const [product, setProduct] = useState({ name: '', description: '', price: '', quantity: '' });
 
   const handleChange = (e) => {
@@ -37,7 +37,7 @@ const ProductForm = ({ onProductAdded }) => {
       <Form.Label>Quantity</Form.Label>
       <Form.Control type="number" name="quantity" value={product.quantity} onChange={handleChange} required />
     </Form.Group>
-    <Button variant="primary" type="submit">Add Product</Button>
+    <Button variant="primary" type="submit">Add Product</Button> 
   </Form>
   );
 };
