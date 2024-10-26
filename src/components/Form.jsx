@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/products';
@@ -19,13 +20,25 @@ const ProductForm = ({ onProductAdded }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input name="name" placeholder="Name" value={product.name} onChange={handleChange} />
-      <input name="description" placeholder="Description" value={product.description} onChange={handleChange} />
-      <input name="price" type="number" placeholder="Price" value={product.price} onChange={handleChange} />
-      <input name="quantity" type="number" placeholder="Quantity" value={product.quantity} onChange={handleChange} />
-      <button type="submit">Add Product</button>
-    </form>
+    <Form onSubmit={handleSubmit}>
+    <Form.Group controlId="formName">
+      <Form.Label>Name</Form.Label>
+      <Form.Control type="text" name="name" value={product.name} onChange={handleChange} required />
+    </Form.Group>
+    <Form.Group controlId="formDescription">
+      <Form.Label>Description</Form.Label>
+      <Form.Control type="text" name="description" value={product.description} onChange={handleChange} />
+    </Form.Group>
+    <Form.Group controlId="formPrice">
+      <Form.Label>Price</Form.Label>
+      <Form.Control type="number" name="price" value={product.price} onChange={handleChange} required />
+    </Form.Group>
+    <Form.Group controlId="formQuantity">
+      <Form.Label>Quantity</Form.Label>
+      <Form.Control type="number" name="quantity" value={product.quantity} onChange={handleChange} required />
+    </Form.Group>
+    <Button variant="primary" type="submit">Add Product</Button>
+  </Form>
   );
 };
 
