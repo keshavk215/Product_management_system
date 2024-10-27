@@ -2,6 +2,8 @@
 
 A Product Management System built with React, Node.js, and PostgreSQL. This application allows users to manage products, including viewing, adding, editing, and deleting products.
 
+The website is deployed at [https://product-management-system-9g7k.onrender.com](https://product-management-system-9g7k.onrender.com/)
+
 ## Table of Contents
 
 - [Features](#features)
