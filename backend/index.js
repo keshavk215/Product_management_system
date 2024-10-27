@@ -1,11 +1,14 @@
 const express = require('express');
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 var bodyParser = require('body-parser');
 const { Pool } = require('pg');
+const authenticateToken = require('./authentication/auth');
 
 const PORT =  5000;
 var corsoption = {
-    origin: 'http://localhost:5173',
+    origin: 'https://product-management-system.vercel.app',
   };
 
   const app = express();
@@ -38,7 +41,25 @@ async function createTable() {
   }
 }
 
-createTable();  
+const createUserTableQuery = `
+  CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL
+);
+`;
+
+async function createUserTable() {
+  try {
+    await pool.query(createUserTableQuery);
+    console.log("Table 'users' created successfully.");
+  } catch (error) {
+    console.error("Error creating table:", error);
+  }
+}
+
+createTable(); 
+createUserTable(); 
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -68,7 +89,7 @@ app.get('/api/products/:id', async (req, res) => {
 });
 
 // POST operation
-app.post('/api/products', async (req, res) => {
+app.post('/api/products', authenticateToken , async (req, res) => {
   const { name, description, price, quantity } = req.body;
   try {
     const result = await pool.query(
@@ -82,7 +103,7 @@ app.post('/api/products', async (req, res) => {
 });
 
 // PUT operation
-app.put('/api/products/:id', async (req, res) => {
+app.put('/api/products/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { name, description, price, quantity } = req.body;
   try {
@@ -97,13 +118,51 @@ app.put('/api/products/:id', async (req, res) => {
 });
 
 // DELETE operation
-app.delete('/api/products/:id', async (req, res) => {
+app.delete('/api/products/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   try {
     await pool.query('DELETE FROM products WHERE id = $1', [id]);
     res.json({ message: 'Product deleted' });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Register user
+app.post('/auth/register', async (req, res) => {
+  const { username, password } = req.body;
+
+  // Hash password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  try {
+      await pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword]);
+      res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+      if (error.code === '23505') { 
+          return res.status(400).json({ message: 'Username already exists' });
+      }
+      res.status(500).json({ error: error.message });
+  }
+});
+
+// Login user
+app.post('/auth/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+      const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+      const user = result.rows[0];
+
+      // Validate user and password
+      if (user && (await bcrypt.compare(password, user.password))) {
+          const token = jwt.sign({ id: user.id }, 'yourSecretKey', { expiresIn: '1h' });
+          res.json({ token });
+      } else {
+          res.status(400).json({ message: 'Invalid credentials' });
+      }
+  } catch (error) {
+      res.status(500).json({ error: error.message });
   }
 });
 
