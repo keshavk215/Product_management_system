@@ -8,7 +8,7 @@ const authenticateToken = require('./authentication/auth');
 
 const PORT =  5000;
 var corsoption = {
-    origin: 'https://product-management-system-iota.vercel.app',
+    origin: 'https://product-management-system-9g7k.onrender.com',
   };
 
   const app = express();
