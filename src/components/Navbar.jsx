@@ -21,6 +21,10 @@ const handleLogout = () => {
   navigate('/');
 };
 
+const handleAdd = () => {
+  navigate('/add');
+};
+
 const [searchQuery, setSearchQuery] = useState("");
 const handleSearchChange = (e) => {
   const query = e.target.value;
@@ -34,7 +38,7 @@ const { token } = useAuth();
       <Navbar sticky="top" style={{background:"rgba(255, 255, 255, 0.2)", backdropFilter:"blur(20px)"}} >
           <Nav className="ml-3 me-auto py-2.5 ">
             <Nav.Link href="/" className='text-white'>All Products</Nav.Link>
-            <Nav.Link href="add" className='text-white'>Add new product</Nav.Link>
+            <Nav.Link onClick={handleAdd} className='text-white'>Add new product</Nav.Link>
           </Nav>
           <Form inline className='mr-4'>
         <Row>
